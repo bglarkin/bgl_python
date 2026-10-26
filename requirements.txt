@@ -1,0 +1,6 @@
+# Tested with Python 3.12. These are teaching versions, not claims of latest releases.
+numpy==2.2.6
+pandas==2.2.3
+scipy==1.16.3
+statsmodels==0.14.5
+matplotlib==3.10.3
