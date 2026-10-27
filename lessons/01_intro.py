@@ -28,6 +28,8 @@ def cm_to_mm(value):
 print(cm_to_mm(height))
 print(type(height))
 
+print(cm_to_mm(7.2))
+
 # %% 2. Read and wrangle (10-25 minutes)
 root = Path.cwd()
 if not (root / "data" / "seedlings.csv").exists():
@@ -36,6 +38,7 @@ out = root / "outputs"
 out.mkdir(exist_ok=True)
 
 raw = pd.read_csv(root / "data" / "seedlings.csv")
+print(type(raw))
 print(raw.head())
 print(raw.shape)                         # attribute: no parentheses
 raw.info()                              # method: parentheses; prints its own output
@@ -47,8 +50,11 @@ print(f"Rows: {len(raw)} raw -> {len(df)} complete; removed {len(raw) - len(df)}
 df["treatment"] = pd.Categorical(
     df["treatment"], categories=["control", "fertilized"]
 )
-df["height_mm"] = df["height_cm"] * 10
-
+df["height_mm"] = df["height_cm"] * 
+df[["height_mm"]]
+df.loc[df["height_cm"] > 25, ["seedling_id","treatment"]]
+df.sort_values("height_cm", ascending=False)
+df.loc[df["height_cm"] > 25, ["seedling_id", "treatment", "height_cm"]].sort_values("height")
 # A boolean mask selects rows; a list of column names selects columns.
 subset = df.loc[
     (df["treatment"] == "fertilized") & (df["soil_moisture_pct"] >= 30),
@@ -65,6 +71,7 @@ by_treatment = (
     .reset_index()
 )
 print(by_treatment.round(2))              # rounds display, keeps full precision above
+df[["height_cm", "height_mm"]].head()
 
 # %% 3. Univariate statistics (25-35 minutes)
 print(df["height_cm"].describe())
@@ -74,11 +81,11 @@ height_summary = df[["height_cm", "soil_moisture_pct"]].describe().T
 # Teaching question: is mean CONTROL height different from 23 cm?
 # 23 cm is an arbitrary exercise benchmark, not a biological threshold.
 control_heights = df.loc[df["treatment"] == "control", "height_cm"]
-one_sample = stats.ttest_1samp(control_heights, popmean=23)
+one_sample = stats.ttest_1samp(control_heights, popmean=24.884386)
 mean_ci = one_sample.confidence_interval(confidence_level=0.95)
 t_table = pd.DataFrame({
     "n": [len(control_heights)], "mean_cm": [control_heights.mean()],
-    "null_mean_cm": [23], "t": [one_sample.statistic],
+    "null_mean_cm": [24.884386], "t": [one_sample.statistic],
     "df": [one_sample.df], "p_value": [one_sample.pvalue],
     "mean_ci_low": [mean_ci.low], "mean_ci_high": [mean_ci.high],
 })
