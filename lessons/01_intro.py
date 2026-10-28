@@ -50,7 +50,7 @@ print(f"Rows: {len(raw)} raw -> {len(df)} complete; removed {len(raw) - len(df)}
 df["treatment"] = pd.Categorical(
     df["treatment"], categories=["control", "fertilized"]
 )
-df["height_mm"] = df["height_cm"] * 
+df["height_mm"] = df["height_cm"] * 10 # mutate
 df[["height_mm"]]
 df.loc[df["height_cm"] > 25, ["seedling_id","treatment"]]
 df.sort_values("height_cm", ascending=False)
@@ -152,8 +152,28 @@ print(f"Saved tables, model summary, and figures to {out}")
 # %% 6. Your turn (56-60 minutes)
 # Without looking at the solutions:
 # A. Select control seedlings with soil_moisture_pct > 30. How many rows?
+
+temp = df.loc[(df["treatment"]=="control") & (df["soil_moisture_pct"]>=30)]
+len(temp)
+temp.shape
+
 # B. Add height_m (meters) to df. What is the mean height_m?
+
+df["height_m"] = df["height_cm"] * 0.01
+df.head()
+df.describe()
+df["height_m"].mean()
+# 0.249
+
 # C. Export mean height_m per treatment to outputs/practice_summary.csv.
+
+by_treatment_m = (
+    df.groupby("treatment", observed=False)
+    .agg(n=("height_m", "size"),
+         mean_height_m=("height_m", "mean"))
+)
+by_treatment_m.round(2).to_csv(out / "by_treatment_meters.csv", index=False)
+
 # Answers: 14 rows; pooled mean about 0.24884 m. See 01_solutions.py after trying.
 
 # %% Optional after the hour: inspect model assumptions
